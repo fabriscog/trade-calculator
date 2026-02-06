@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Size Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-900">
+    <div class="min-h-screen p-6 flex items-center justify-center">
+        <div class="w-full max-w-md">
+            <div class="bg-slate-800 rounded-xl shadow-2xl p-6 border border-slate-700">
+                <h1 class="text-2xl font-bold text-white mb-6 text-center">
+                    📊 Trade Size Calculator
+                </h1>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-1">
+                            Account Balance (€)
+                        </label>
+                        <input
+                            type="number"
+                            id="accountBalance"
+                            placeholder="10000"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-1">
+                            Risk per Trade (%)
+                        </label>
+                        <input
+                            type="number"
+                            id="riskPercent"
+                            value="1"
+                            placeholder="1"
+                            step="0.1"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-1">
+                            Entry Price
+                        </label>
+                        <input
+                            type="number"
+                            id="entryPrice"
+                            placeholder="100.00"
+                            step="any"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-1">
+                            Stop Loss Price
+                        </label>
+                        <input
+                            type="number"
+                            id="stopLoss"
+                            placeholder="95.00"
+                            step="any"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-1">
+                            Take Profit 1 Price
+                        </label>
+                        <input
+                            type="number"
+                            id="takeProfit1"
+                            placeholder="110.00"
+                            step="any"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm font-medium mb-1">
+                            Take Profit 2 Price
+                        </label>
+                        <input
+                            type="number"
+                            id="takeProfit2"
+                            placeholder="120.00"
+                            step="any"
+                            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div id="errorMessage" class="hidden p-3 bg-red-900/50 border border-red-500 rounded-lg text-red-300 text-sm">
+                    </div>
+
+                    <button
+                        onclick="calculateTradeSize()"
+                        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-800"
+                    >
+                        Submit
+                    </button>
+                </div>
+
+                <div id="resultSection" class="hidden mt-6 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
+                    <div class="text-center mb-4">
+                        <span id="directionBadge" class="inline-block px-3 py-1 rounded-full text-sm font-medium">
+                        </span>
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <p class="text-slate-400 text-sm">Trade Size</p>
+                        <p id="tradeSize" class="text-3xl font-bold text-green-400"></p>
+                        <p class="text-slate-400 text-xs">units</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="bg-slate-800 p-3 rounded-lg">
+                            <p class="text-slate-400 text-xs">Risk Amount</p>
+                            <p id="riskAmount" class="text-white font-semibold"></p>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg">
+                            <p class="text-slate-400 text-xs">Position Value</p>
+                            <p id="positionValue" class="text-white font-semibold"></p>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg">
+                            <p class="text-slate-400 text-xs">R:R (TP1)</p>
+                            <p id="rr1" class="text-blue-400 font-semibold"></p>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg">
+                            <p class="text-slate-400 text-xs">R:R (TP2)</p>
+                            <p id="rr2" class="text-blue-400 font-semibold"></p>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg">
+                            <p class="text-slate-400 text-xs">Profit @ TP1</p>
+                            <p id="profit1" class="text-green-400 font-semibold"></p>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg">
+                            <p class="text-slate-400 text-xs">Profit @ TP2</p>
+                            <p id="profit2" class="text-green-400 font-semibold"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = '⚠️ ' + message;
+            errorDiv.classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
+        }
+
+        function calculateTradeSize() {
+            hideError();
+
+            const balance = parseFloat(document.getElementById('accountBalance').value);
+            const entry = parseFloat(document.getElementById('entryPrice').value);
+            const sl = parseFloat(document.getElementById('stopLoss').value);
+            const tp1 = parseFloat(document.getElementById('takeProfit1').value);
+            const tp2 = parseFloat(document.getElementById('takeProfit2').value);
+            const risk = parseFloat(document.getElementById('riskPercent').value);
+
+            if (isNaN(balance) || isNaN(entry) || isNaN(sl) || isNaN(tp1) || isNaN(tp2) || isNaN(risk)) {
+                showError('Please fill in all fields with valid numbers');
+                return;
+            }
+
+            if (balance <= 0 || entry <= 0 || sl <= 0 || tp1 <= 0 || tp2 <= 0) {
+                showError('All values must be greater than 0');
+                return;
+            }
+
+            if (risk <= 0 || risk > 100) {
+                showError('Risk percentage must be between 0 and 100');
+                return;
+            }
+
+            const isLong = entry > sl;
+            
+            if (isLong) {
+                if (tp1 <= entry || tp2 <= entry) {
+                    showError('For LONG trades, Take Profit prices must be above Entry Price');
+                    return;
+                }
+            } else {
+                if (tp1 >= entry || tp2 >= entry) {
+                    showError('For SHORT trades, Take Profit prices must be below Entry Price');
+                    return;
+                }
+            }
+
+            const riskAmount = balance * (risk / 100);
+            const stopLossDistance = Math.abs(entry - sl);
+            const tradeSize = riskAmount / stopLossDistance;
+            
+            const tp1Distance = Math.abs(tp1 - entry);
+            const tp2Distance = Math.abs(tp2 - entry);
+            
+            const rr1 = tp1Distance / stopLossDistance;
+            const rr2 = tp2Distance / stopLossDistance;
+            
+            const potentialProfit1 = tradeSize * tp1Distance;
+            const potentialProfit2 = tradeSize * tp2Distance;
+            const positionValue = tradeSize * entry;
+
+            // Display results
+            document.getElementById('tradeSize').textContent = tradeSize.toFixed(4);
+            document.getElementById('riskAmount').textContent = '€' + riskAmount.toFixed(2);
+            document.getElementById('positionValue').textContent = '€' + positionValue.toFixed(2);
+            document.getElementById('rr1').textContent = '1:' + rr1.toFixed(2);
+            document.getElementById('rr2').textContent = '1:' + rr2.toFixed(2);
+            document.getElementById('profit1').textContent = '€' + potentialProfit1.toFixed(2);
+            document.getElementById('profit2').textContent = '€' + potentialProfit2.toFixed(2);
+
+            const badge = document.getElementById('directionBadge');
+            badge.textContent = isLong ? 'LONG' : 'SHORT';
+            badge.className = 'inline-block px-3 py-1 rounded-full text-sm font-medium ' + 
+                (isLong ? 'bg-green-600 text-white' : 'bg-red-600 text-white');
+
+            document.getElementById('resultSection').classList.remove('hidden');
+        }
+
+        // Allow Enter key to submit
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculateTradeSize();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
